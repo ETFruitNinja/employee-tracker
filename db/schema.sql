@@ -13,9 +13,9 @@ CREATE TABLE role (
     title VARCHAR(30) NOT NULL, -- holds role title
     salary DECIMAL NOT NULL, -- holds role salary
     department_id INT -- holds reference to department role belongs to
-    FOREIGN KEY (department_id)
-    REFERENCES department(id)
-    ON DELETE SET NULL
+    -- FOREIGN KEY (department_id)
+    -- REFERENCES department(id)
+    -- ON DELETE SET NULL
 );
 
 CREATE TABLE employee (
@@ -24,7 +24,7 @@ CREATE TABLE employee (
     last_name VARCHAR(30) NOT NULL, -- holds employee last name
     role_id INT NOT NULL, -- holds reference to employee role
     manager_id INT -- holds reference to another employee that is the manager of the current employee
-    FOREIGN KEY (role_id)
-    REFERENCES role(id)
-    ON DELETE SET NULL
+    -- FOREIGN KEY (role_id)
+    -- REFERENCES role(id)
+    -- ON DELETE SET NULL
 );
