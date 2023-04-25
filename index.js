@@ -22,12 +22,15 @@ const db = mysql.createConnection(
 function runProgram() {
     inquirer
     .prompt([
+        // initial question prompting user for action
         {
             type: 'list',
             message: 'What would you like to do?',
             name: 'action',
             choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add Department', 'Add Role', 'Add Employee', 'Update Employee Role', 'Quit']
+            // TODO: add delete function
         },
+        // if user wants to add DEPARTMENT to db, prompts user for NAME of department
         {
             type: 'input',
             message: 'What is the name of the department you would like to add?',
@@ -35,7 +38,42 @@ function runProgram() {
             when: function(data) {
                 return data.action === 'Add Department';
             }
-        }
+        },
+        // if user wants to add ROLE to db, prompts user for NAME of role
+        {
+            type: 'input',
+            message: 'What is the name of the role you would like to add?',
+            name: 'addRole',
+            when: function(data) {
+                return data.action === 'Add Role';
+            }
+        },
+        // if user wants to add ROLE to db, prompts user for SALARY of role
+        {
+            type: 'input',
+            message: 'What is the salary of the role you would like to add?',
+            name: 'addSalary',
+            when: function(data) {
+                return data.action === 'Add Role';
+            }
+        },
+        // if user wants to add ROLE to db, prompts user for DEPARTMENT that role belongs to
+        {
+            type: 'input',
+            message: 'Which department does this new role belong to?',
+            name: 'sortRole',
+            when: function(data) {
+                return data.action === 'Add Role';
+            }
+        },
+        {
+            type: 'input',
+            message: 'What is the name of the employee you would like to add?',
+            name: 'addEmployee',
+            when: function(data) {
+                return data.action === 'Add Employee';
+            }
+        },
     ])
     .then((data) => {
         if (data.action === 'Quit') {
@@ -60,6 +98,7 @@ function runProgram() {
                 runProgram();
             });
         } else if (data.action === 'Add Department') {
+            // adds department to database
             db.query('INSERT INTO department (name) VALUES (?)', data.addDepartment, (err, result) => {
                 if (err) {
                     console.log(err);
@@ -69,6 +108,38 @@ function runProgram() {
                 runProgram();
             });
             
+        } else if (data.action === 'Add Role') {
+            // retrieve department id based on department name entered by user
+            db.query('SELECT id FROM department WHERE name = ?', [data.sortRole], (err, depIdResult) => {
+                if (err) {
+                    console.log(err);
+                }
+                // adds role title, salary, and department to database
+                db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [data.addRole, data.addSalary, depIdResult[0].id], (err, result) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log(`Added ${data.addRole} to the database.`);
+                    }
+                    runProgram();
+                });
+            })
+        } else if (data.action === 'Add Employee') {
+            // retrieve employee id based on department name entered by user
+            db.query('SELECT id FROM department WHERE name = ?', [data.sortRole], (err, depIdResult) => {
+                if (err) {
+                    console.log(err);
+                }
+                // adds role title, salary, and department to database
+                db.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [data.addRole, data.addSalary, depIdResult[0].id], (err, result) => {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log(`Added ${data.addRole} to the database.`);
+                    }
+                    runProgram();
+                });
+            })
         }
     })
     .catch((error) => {
